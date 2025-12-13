@@ -144,3 +144,33 @@ if __name__ == '__main__':
     
     print("\n--- Visualization Complete ---")
     print("Successfully generated and saved result.png file.")
+
+
+
+    # return results for Agent 
+def run_simulation_and_get_results():
+    """Executes the full MC workflow and returns the VaR Loss, VaR Value, and CVaR Loss."""
+    # 1. Data Ingestion and Parameter Calculation
+    raw_data = load_historical_fx_data()
+    processed_data = clean_and_preprocess_data(raw_data)
+    mu_annual, sigma_annual = calculate_risk_parameters(processed_data, ANNUAL_TRADING_DAYS)
+    
+    if mu_annual is None:
+        return 0, 0, 0 # Return zeros if calculation fails
+
+    # 2. Run Simulation
+    final_values = run_monte_carlo_simulation(
+        mu_annual=mu_annual,
+        sigma_annual=sigma_annual,
+        initial_investment=INITIAL_INVESTMENT,
+        forecast_days=FORECAST_DAYS,
+        num_simulations=NUM_SIMULATIONS
+    )
+    
+    # 3. Calculate Risk
+    var_loss, var_value, cvar_loss = calculate_value_at_risk(final_values, CONFIDENCE_LEVEL)
+    
+    # Note: Visualization is skipped here as the main script handles it.
+    
+    return var_loss, var_value, cvar_loss
+
