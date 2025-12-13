@@ -57,9 +57,12 @@ The following visualization demonstrates the probabilistic distribution of the p
 
 The project is developed using **Python 3.12** and relies on the following major scientific computing and data analysis libraries:
 
-* **numpy**: High-performance numerical computing and array operations.
-* **pandas**: Data structuring, manipulation, and time-series handling.
-* **matplotlib**: Visualization for generating the `result.png` risk distribution chart.
+| Library | Suggested Version | Purpose |
+| :--- | :--- | :--- |
+| **numpy** | $\ge 2.1$ | Scientific computing and array operations |
+| **pandas** | $\ge 2.2$ | Data structures and time-series manipulation |
+| **matplotlib** | $\ge 3.9$ | Plotting and visualization (generates `result.png`) |
+
 
 ### 5.2. Installation Guide
 
