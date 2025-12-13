@@ -1,15 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Dec 12 22:10:53 2025
-
-@author: admin
-"""
-
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
-# Mock API function to fetch stock data (simulating a real API call)
+# Simulate a real API call
 def fetch_mock_stock_data(ticker: str, start_date: str, end_date: str) -> pd.DataFrame:
     """
     Simulates fetching financial time series data (e.g., historical stock prices).
@@ -18,7 +11,7 @@ def fetch_mock_stock_data(ticker: str, start_date: str, end_date: str) -> pd.Dat
     dates = pd.date_range(start=start_date, end=end_date, freq='B')
     num_days = len(dates)
     
-    # Generate simulated price data (random walk for realism)
+    # Generate simulated price data
     initial_price = 100
     returns = np.random.normal(0.0005, 0.01, num_days)
     prices = initial_price * np.exp(np.cumsum(returns))
@@ -70,4 +63,5 @@ if __name__ == '__main__':
     print(processed_data.head())
     print("\nStatistical Summary of Log Returns:")
     print(processed_data['Log_Returns'].describe())
+
 
