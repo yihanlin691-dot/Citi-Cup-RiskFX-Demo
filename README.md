@@ -26,7 +26,7 @@ This simplified version isolates the core quantitative modules I designed and im
 ## ⚙️ 3. Core Modules & Methodology
 ### A. Data Processing (data_ingestion_and_cleaning.py)
 Responsible for transforming raw time-series data into a format suitable for stochastic modeling.
- * **Method**: Fetches historical FX data and calculates Daily Log Returns (r_t = \ln(P_t / P_{t-1})).
+ * **Method**: Fetches historical FX data and calculates Daily Log Returns ($$r_t = \ln(P_t / P_{t-1})$$).
  * **Key Output**: Historical volatility and drift parameters.
 ### B. Monte Carlo Risk Engine (monte_carlo_risk_simulation.py)
 This is the core computational engine. It projects 10,000 potential future price paths using the **Geometric Brownian Motion (GBM)** model: $$dS_t = \mu S_t dt + \sigma S_t dW_t$$
