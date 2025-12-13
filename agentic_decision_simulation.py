@@ -1,15 +1,42 @@
 import numpy as np  
 from typing import List, Any, Dict 
 
+# run the Monte Carlo model
+try:
+    from monte_carlo_risk_simulation import run_simulation_and_get_results
+except ImportError:
+    # Fallback for local testing if the file structure is not right
+    print("WARNING: Could not import run_simulation_and_get_results. Using mock data.")
+    def run_simulation_and_get_results():
+        return np.random.randint(1000, 5000), 100000 - np.random.randint(1000, 5000), np.random.randint(5000, 8000)
+
 # 1. Define Tools 
 
+def determine_risk_level(var_loss: float, initial_investment: float = 100000) -> str:
+    """Helper function to classify risk based on VaR percentage."""
+    var_percent = var_loss / initial_investment
+    if var_percent > 0.04:  # Loss over 4% is High Risk (e.g., VaR Loss > $4,000)
+        return "HIGH"
+    elif var_percent > 0.01: # Loss between 1% and 4% is Moderate Risk
+        return "MODERATE"
+    else: # Loss less than 1% is Low Risk
+        return "LOW"
+
 def risk_analysis_tool(ticker: str, forecast_days: int) -> str:
-    """Simulates calling the Monte Carlo model to get risk data."""
-    print(f"-> TOOL CALL: Executing Monte Carlo Risk Analysis for {ticker} over {forecast_days} days...")
-    # Mock Risk Data (using numpy for random generation)
-    mock_var_loss = np.random.randint(1000, 5000)
-    # The output format is crucial for the parser in the decision loop
-    return f"RESULT: 99% VaR Loss for {ticker} is ${mock_var_loss:,.0f}. Risk is considered MODERATE."
+    """
+    Executes the actual Monte Carlo model and returns the risk data.
+    """
+    print(f"-> TOOL CALL: Executing REAL Monte Carlo Risk Analysis for {ticker} over {forecast_days} days...")
+    
+    # CORE INTEGRATION POINT
+    var_loss, var_value, cvar_loss = run_simulation_and_get_results()
+    
+    risk_level = determine_risk_level(var_loss)
+    
+    return (
+        f"RESULT: 99% VaR Loss for {ticker} is ${var_loss:,.0f} (Value: ${var_value:,.0f}). "
+        f"CVaR Loss is ${cvar_loss:,.0f}. Risk is considered {risk_level}."
+    )
 
 def strategy_lookup_tool(risk_level: str) -> str:
     """Simulates querying a database or LLM for suitable strategies."""
@@ -21,7 +48,7 @@ def strategy_lookup_tool(risk_level: str) -> str:
     else: # HIGH or other
         return "RESULT: Strategy suggests: Immediately reduce high-beta assets and raise cash reserves to 20%."
 
-# 2. Define Agent State and Nodes  
+# 2. Define Agent State and Nodes
 
 class AgentState:
     """Represents the mutable state passed between agent steps."""
@@ -39,7 +66,6 @@ def decision_node(state: AgentState) -> str:
         print("Decision: Risk data is missing. Calling Risk Analysis Tool.")
         return "call_risk_tool"
     elif not state.strategy_advice:
-        # Note: We need to parse the risk level from risk_data before calling strategy tool
         print("Decision: Risk data available. Proceeding to call Strategy Lookup Tool.")
         return "call_strategy_tool"
     else:
@@ -50,7 +76,8 @@ def decision_node(state: AgentState) -> str:
 
 def execute_risk_tool(state: AgentState) -> AgentState:
     """Executes the risk_analysis_tool and updates the state."""
-    result = risk_analysis_tool(state.ticker, forecast_days=30)
+    # Ensure forecast_days parameter is handled if needed, here we use default (30)
+    result = risk_analysis_tool(state.ticker, forecast_days=30) 
     state.risk_data = result
     return state
 
@@ -59,24 +86,19 @@ def execute_strategy_tool(state: AgentState) -> AgentState:
     
     if state.risk_data and 'Risk is considered ' in state.risk_data:
         try:
-            # Robust Parsing Logic to prevent 'list index out of range'
-            # 1. Get the segment after the main separator
             risk_segment = state.risk_data.split('Risk is considered ')[1]
-            # 2. Get the risk level before the first period
             risk_level = risk_segment.split('.')[0].strip()
             
-            # 3. Validation and execution
             if risk_level in ['MODERATE', 'HIGH', 'LOW']:
                 result = strategy_lookup_tool(risk_level)
                 state.strategy_advice = result
             else:
-                print(f"WARNING: Extracted risk level '{risk_level}' is invalid. Defaulting.")
+                print(f"WARNING: Extracted risk level '{risk_level}' is invalid. Defaulting to MODERATE.")
                 result = strategy_lookup_tool('MODERATE')
                 state.strategy_advice = result
                 
-        except IndexError:
-            # Catches the 'list index out of range' error if the format changes
-            print("ERROR: Parsing failed due to unexpected tool output format.")
+        except (IndexError, AttributeError):
+            print("ERROR: Parsing failed due to unexpected tool output format or missing data.")
             state.strategy_advice = "ERROR: Failed to parse risk level."
             
     else:
@@ -98,7 +120,7 @@ def final_synthesis(state: AgentState) -> AgentState:
     state.final_decision = decision_text
     return state
 
-# 5. Simplified Agent Loop (Simulating LangGraph execution flow)
+# 5. Simplified Agent Loop
 
 def run_agent_workflow(initial_state: AgentState):
     current_state = initial_state
@@ -124,5 +146,3 @@ if __name__ == '__main__':
     initial_state = AgentState(ticker="EUR/USD", initial_prompt=initial_request)
     
     run_agent_workflow(initial_state)
-
-
