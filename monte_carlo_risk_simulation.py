@@ -170,7 +170,6 @@ def run_simulation_and_get_results():
     # 3. Calculate Risk
     var_loss, var_value, cvar_loss = calculate_value_at_risk(final_values, CONFIDENCE_LEVEL)
     
-    # Note: Visualization is skipped here as the main script handles it.
-    
     return var_loss, var_value, cvar_loss
+
 
