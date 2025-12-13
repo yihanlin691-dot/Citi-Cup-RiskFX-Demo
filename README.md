@@ -14,6 +14,7 @@ How to accurately forecast the **Value at Risk (VaR)** and **Conditional VaR (CV
 This simplified version isolates the core quantitative modules I designed and implemented:
 
 ```text
+├── FX_Historical_Data.csv           # [Data Layer] Historical FX Data source 
 ├── data_ingestion_and_cleaning.py   # [Data Layer] Preprocessing & Return Calculation
 ├── monte_carlo_risk_simulation.py   # [Model Layer] Stochastic Simulation & VaR Engine
 ├── agentic_decision_simulation.py   # [Decision Layer] Automated Risk Mitigation Strategy
@@ -26,7 +27,7 @@ This simplified version isolates the core quantitative modules I designed and im
 ## ⚙️ 3. Core Modules & Methodology
 ### A. Data Processing (data_ingestion_and_cleaning.py)
 Responsible for transforming raw time-series data into a format suitable for stochastic modeling.
- * **Method**: Fetches historical FX data and calculates Daily Log Returns ($$r_t = \ln(P_t / P_{t-1})$$).
+ * **Method**: Loads historical FX data from the local FX_Historical_Data.csv file and calculates Daily Log Returns ($$r_t = \ln(P_t / P_{t-1})$$).
  * **Key Output**: Historical volatility and drift parameters.
 ### B. Monte Carlo Risk Engine (monte_carlo_risk_simulation.py)
 This is the core computational engine. It projects 10,000 potential future price paths using the **Geometric Brownian Motion (GBM)** model: $$dS_t = \mu S_t dt + \sigma S_t dW_t$$
@@ -41,7 +42,8 @@ Simulates a risk-aware trading agent that utilizes the calculated VaR metrics.
 
 ## 📊 4. Simulation Results
 The following visualization demonstrates the probabilistic distribution of the portfolio's future value. The red dashed line highlights the Value at Risk (VaR) threshold at a 99% confidence level.
-<img width="1200" height="700" alt="result" src="https://github.com/user-attachments/assets/36c86fae-8666-4a7c-967e-ea3415966c64" />
+<img width="1200" height="700" alt="result_revised" src="https://github.com/user-attachments/assets/4a4bb008-305d-4a21-b1b8-179dc68181fc" />
+
 
 ### Key Findings
  * **Initial Investment**: $100,000
@@ -74,7 +76,10 @@ It is highly recommended to set up a virtual environment (e.g., using `venv` or 
     cd Citi-Cup-RiskFX-Demo
     ```
 
-2.  **Install Required Libraries:**
+2.  **Add Data File:**
+    Place the FX_Historical_Data.csv file directly into the root directory of the Citi-Cup-RiskFX-Demo folder.
+    
+3.  **Install Required Libraries:**
     Install all dependencies mentioned above: 
     ```bash
     pip install numpy pandas matplotlib
