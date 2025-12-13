@@ -1,14 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Dec 12 22:14:08 2025
-
-@author: admin
-"""
-
 import numpy as np  
 from typing import List, Any, Dict 
 
-# 1. Define Tools (Functions the Agent can call) 
+# 1. Define Tools 
 
 def risk_analysis_tool(ticker: str, forecast_days: int) -> str:
     """Simulates calling the Monte Carlo model to get risk data."""
@@ -28,7 +21,7 @@ def strategy_lookup_tool(risk_level: str) -> str:
     else: # HIGH or other
         return "RESULT: Strategy suggests: Immediately reduce high-beta assets and raise cash reserves to 20%."
 
-# 2. Define Agent State and Nodes (Simplified LangGraph Concept) 
+# 2. Define Agent State and Nodes  
 
 class AgentState:
     """Represents the mutable state passed between agent steps."""
@@ -53,7 +46,7 @@ def decision_node(state: AgentState) -> str:
         print("Decision: All required data available. Proceeding to Final Synthesis.")
         return "final_synthesis"
 
-# 3. Define Execution Nodes (Tool Callers) 
+# 3. Define Execution Nodes
 
 def execute_risk_tool(state: AgentState) -> AgentState:
     """Executes the risk_analysis_tool and updates the state."""
@@ -69,7 +62,7 @@ def execute_strategy_tool(state: AgentState) -> AgentState:
             # Robust Parsing Logic to prevent 'list index out of range'
             # 1. Get the segment after the main separator
             risk_segment = state.risk_data.split('Risk is considered ')[1]
-            # 2. Get the risk level (e.g., MODERATE) before the first period
+            # 2. Get the risk level before the first period
             risk_level = risk_segment.split('.')[0].strip()
             
             # 3. Validation and execution
@@ -131,4 +124,5 @@ if __name__ == '__main__':
     initial_state = AgentState(ticker="EUR/USD", initial_prompt=initial_request)
     
     run_agent_workflow(initial_state)
+
 
