@@ -15,7 +15,6 @@ def load_historical_fx_data(file_path: str = "FX_Historical_Data.csv") -> pd.Dat
     print(f"--- 1. Data Ingestion: Attempting to read file '{file_path}' ---")
     try:
         # Load data from the local CSV file
-        # ASSUMPTION: The CSV must contain 'Date' and 'Close' columns
         df = pd.read_csv(file_path)
         
         # Validation checks
@@ -51,11 +50,11 @@ def clean_and_preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     # Ensure price column is numeric
     df['Close'] = pd.to_numeric(df['Close'], errors='coerce')
     
-    # Data Cleaning: Fill missing values (if any)
+    # Data Cleaning (if any)
     df.fillna(method='ffill', inplace=True)
     df.fillna(method='bfill', inplace=True)
     
-    # Feature Engineering: Calculate Log Returns
+    # Calculate Log Returns
     df['Log_Returns'] = np.log(df['Close'] / df['Close'].shift(1))
     
     # Drop the first row which contains NaN log return
@@ -82,10 +81,10 @@ def calculate_risk_parameters(processed_data: pd.DataFrame, annual_trading_days:
     log_returns = processed_data['Log_Returns']
     T = annual_trading_days 
     
-    # Drift (mu) - Annualized Mean
+    # Drift (mu) 
     mu = log_returns.mean() * T
     
-    # Volatility (sigma) - Annualized Standard Deviation
+    # Volatility (sigma) 
     sigma = log_returns.std() * np.sqrt(T)
 
     print("-" * 30)
@@ -97,13 +96,13 @@ def calculate_risk_parameters(processed_data: pd.DataFrame, annual_trading_days:
     return mu, sigma
 
 if __name__ == '__main__':
-    # 1. Ingestion: Load data from the local CSV file
+    # 1. Load data from the local CSV file
     raw_data = load_historical_fx_data()
     
-    # 2. Cleaning and Preprocessing: Clean data and calculate log returns
+    # 2. Clean data and calculate log returns
     processed_data = clean_and_preprocess_data(raw_data)
     
-    # 3. Parameter Calculation: Calculate GBM parameters
+    # 3. Calculate GBM parameters
     mu, sigma = calculate_risk_parameters(processed_data)
     
     if not processed_data.empty:
@@ -114,3 +113,4 @@ if __name__ == '__main__':
 
     if mu is not None:
         print("\n--- Success! Data Cleaning and Parameter Extraction completed.---")
+
